@@ -1,7 +1,5 @@
 package com.laboratorio.tumblr.impl;
 
-import com.google.gson.JsonSyntaxException;
-import com.laboratorio.clientapilibrary.exceptions.ApiClientException;
 import com.laboratorio.clientapilibrary.model.ApiMethodType;
 import com.laboratorio.clientapilibrary.model.ApiRequest;
 import com.laboratorio.clientapilibrary.model.ApiResponse;
@@ -19,7 +17,7 @@ import java.util.List;
  * author Rafael
  * version 1.0
  * created 01/05/2025
- * updated 01/05/2025
+ * updated 02/05/2025
  */
 public class TumblrStatusApiImpl extends TumblrBaseApi implements TumblrStatusApi {
     private final String blog;
@@ -34,16 +32,60 @@ public class TumblrStatusApiImpl extends TumblrBaseApi implements TumblrStatusAp
         return postStatus(text, null);
     }
 
+    private boolean esUrlYouTube(String url) {
+        if (url == null) {
+            return false;
+        }
+
+        return url.matches("^(https?://)?(www\\.)?(youtube\\.com|youtu\\.be)/.+$");
+    }
+
+    // Retorna la primera ULR de youtube encontrada o nulo en otro caso
+    private String findYoutubeUrl(List<ElementoPost> elementos) {
+        for (ElementoPost elemento : elementos) {
+            if (elemento.getType() == TipoElementoPost.Link) {
+                if (this.esUrlYouTube(elemento.getContenido())) {
+                    return elemento.getContenido();
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private String obtenerEtiquetas(List<ElementoPost> elementos) {
+        String etiquetas = "";
+        for (ElementoPost elemento : elementos) {
+            if (elemento.getType() == TipoElementoPost.Tag) {
+                if (!etiquetas.isEmpty()) {
+                    etiquetas += ",";
+                }
+                etiquetas += elemento.getContenido();
+            }
+        }
+
+        return etiquetas;
+    }
+
     @Override
     public TumblrStatusResponse postStatus(String text, String imagePath) {
         String endpoint = this.config.getProperty("post_endpoint");
         int okStatus = Integer.parseInt(this.config.getProperty("post_valor_ok"));
         String complementoEndpoint = this.config.getProperty("post_complemento_endpoint");
+
+        List<ElementoPost> elementos = PostUtils.extraerElementosPost(text);
+        String etiquetas = this.obtenerEtiquetas(elementos);
+        String urlYoutube = this.findYoutubeUrl(elementos);
+
         String postType;
-        if (imagePath == null) {
-            postType = this.config.getProperty("post_text_type");
+        if (urlYoutube != null) {
+            postType = this.config.getProperty("post_video_type");
         } else {
-            postType = this.config.getProperty("post_image_type");
+            if (imagePath == null) {
+                postType = this.config.getProperty("post_text_type");
+            } else {
+                postType = this.config.getProperty("post_image_type");
+            }
         }
 
         try {
@@ -52,24 +94,16 @@ public class TumblrStatusApiImpl extends TumblrBaseApi implements TumblrStatusAp
             request.addTextFormData("type", postType);
             request.addApiHeader("Authorization", "Bearer " + this.accessToken);
 
-            List<ElementoPost> elementos = PostUtils.extraerElementosPost(text);
-            String textoPost = text;
-            String etiquetas = "";
-            for (ElementoPost elemento : elementos) {
-                if (elemento.getType() == TipoElementoPost.Tag) {
-                    if (!etiquetas.isEmpty()) {
-                        etiquetas += ",";
-                    }
-                    etiquetas += elemento.getContenido();
-                    textoPost = textoPost.replace(elemento.getContenido(), "");
-                }
-            }
-
-            if (imagePath == null) {
-                request.addTextFormData("body", textoPost);
+            if (urlYoutube != null) {
+                request.addTextFormData("caption", text);
+                request.addTextFormData("embed", urlYoutube);
             } else {
-                request.addTextFormData("caption", textoPost);
-                request.addFileFormData("data", imagePath);
+                if (imagePath == null) {
+                    request.addTextFormData("body", text);
+                } else {
+                    request.addTextFormData("caption", text);
+                    request.addFileFormData("data", imagePath);
+                }
             }
             if (!etiquetas.isEmpty()) {
                 request.addTextFormData("tags", etiquetas);
@@ -79,13 +113,8 @@ public class TumblrStatusApiImpl extends TumblrBaseApi implements TumblrStatusAp
             log.info("Post response: {}", response.getResponseStr());
 
             return this.gson.fromJson(response.getResponseStr(), TumblrStatusResponse.class);
-        } catch (JsonSyntaxException e) {
-            this.logException(e);
-            throw e;
-        } catch (ApiClientException e) {
-            throw e;
         } catch (Exception e) {
-            throw new TumblrApiException(TumblrSessionApiImpl.class.getName(), "No se pudo postear una imagen en Tumblr", e);
+            throw new TumblrApiException("No se pudo postear una imagen en Tumblr", e);
         }
     }
 
@@ -105,13 +134,8 @@ public class TumblrStatusApiImpl extends TumblrBaseApi implements TumblrStatusAp
             log.info("Delete Post response: {}", response.getResponseStr());
 
             return true;
-        } catch (JsonSyntaxException e) {
-            this.logException(e);
-            throw e;
-        } catch (ApiClientException e) {
-            throw e;
         } catch (Exception e) {
-            throw new TumblrApiException(TumblrSessionApiImpl.class.getName(), "Error eliminando un estado en Tumblr", e);
+            throw new TumblrApiException("Error eliminando un estado en Tumblr", e);
         }
     }
 }

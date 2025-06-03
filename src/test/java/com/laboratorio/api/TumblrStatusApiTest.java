@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * author Rafael
  * version 1.0
  * created 01/05/2025
- * updated 01/05/2025
+ * updated 02/05/2025
  */
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -62,6 +62,30 @@ public class TumblrStatusApiTest {
 
     @Test @Order(4)
     public void deleteImagePost() {
+        boolean result = this.statusApi.deleteStatus(postId);
+
+        assertTrue(result);
+    }
+
+    @Test @Order(5)
+    public void postVideoTest() {
+        String texto = "Tengo publicado en Youtube un tutorial que explica como instalar #Kafka Con #Docker.\n" +
+                "Es una plataforma de streaming distribuida utilizada en aplicaciones de datos en tiempo real.\n" +
+                "\n" +
+                "https://youtu.be/4uuReS6qG6Q\n" +
+                "\n" +
+                "#SiguemeYTeSigo #Followback";
+        String imagePath = "C:\\Users\\rafa\\Pictures\\Formula_1\\Spa_1950.jpg";
+
+        TumblrStatusResponse response = this.statusApi.postStatus(texto, imagePath);
+        postId = response.getResponse().getId_string();
+
+        assertNotNull(response.getMeta());
+        assertNotNull(response.getResponse());
+    }
+
+    @Test @Order(6)
+    public void deleteVideoPost() {
         boolean result = this.statusApi.deleteStatus(postId);
 
         assertTrue(result);

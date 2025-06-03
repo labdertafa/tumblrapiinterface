@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
  * author Rafael
  * version 1.0
  * created 01/05/2025
- * updated 01/05/2025
+ * updated 02/05/2025
  */
 public class TumblrBaseApi {
     protected static final Logger log = LogManager.getLogger(TumblrBaseApi.class);
@@ -27,12 +27,5 @@ public class TumblrBaseApi {
         this.urlBase = this.config.getProperty("url_base_tumblr");
         this.client = new ApiClient();
         this.gson = new Gson();
-    }
-
-    protected void logException(Exception e) {
-        log.error("Error: {}", e.getMessage());
-        if (e.getCause() != null) {
-            log.error("Causa: {}", e.getCause().getMessage());
-        }
     }
 }

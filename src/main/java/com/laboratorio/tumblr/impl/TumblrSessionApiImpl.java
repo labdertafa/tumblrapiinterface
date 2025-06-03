@@ -1,7 +1,5 @@
 package com.laboratorio.tumblr.impl;
 
-import com.google.gson.JsonSyntaxException;
-import com.laboratorio.clientapilibrary.exceptions.ApiClientException;
 import com.laboratorio.clientapilibrary.model.ApiMethodType;
 import com.laboratorio.clientapilibrary.model.ApiRequest;
 import com.laboratorio.clientapilibrary.model.ApiResponse;
@@ -14,7 +12,7 @@ import com.laboratorio.tumblr.model.TumblrSessionResponse;
  * author Rafael
  * version 1.0
  * created 01/05/2025
- * updated 01/05/2025
+ * updated 02/05/2025
  */
 public class TumblrSessionApiImpl extends TumblrBaseApi implements TumblrSessionApi {
     public TumblrSessionApiImpl(String accessToken) {
@@ -42,13 +40,8 @@ public class TumblrSessionApiImpl extends TumblrBaseApi implements TumblrSession
             log.info("Refresh Session response: {}", response.getResponseStr());
 
             return this.gson.fromJson(response.getResponseStr(), TumblrSessionResponse.class);
-        } catch (JsonSyntaxException e) {
-            this.logException(e);
-            throw e;
-        } catch (ApiClientException e) {
-            throw e;
         } catch (Exception e) {
-            throw new TumblrApiException(TumblrSessionApiImpl.class.getName(), "No se pudo refrescar la sesión de Tumblr", e);
+            throw new TumblrApiException("No se pudo refrescar la sesión de Tumblr", e);
         }
     }
 }

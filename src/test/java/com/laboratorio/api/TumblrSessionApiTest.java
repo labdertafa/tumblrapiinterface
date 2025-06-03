@@ -3,6 +3,7 @@ package com.laboratorio.api;
 import com.laboratorio.clientapilibrary.exceptions.ApiClientException;
 import com.laboratorio.clientapilibrary.utils.ReaderConfig;
 import com.laboratorio.tumblr.TumblrSessionApi;
+import com.laboratorio.tumblr.exception.TumblrApiException;
 import com.laboratorio.tumblr.impl.TumblrSessionApiImpl;
 import com.laboratorio.tumblr.model.TumblrSessionResponse;
 import static org.junit.jupiter.api.Assertions.*;
@@ -14,7 +15,7 @@ import org.junit.jupiter.api.Test;
  * author Rafael
  * version 1.0
  * created 01/05/2025
- * updated 01/05/2025
+ * updated 02/05/2025
  */
 public class TumblrSessionApiTest {
     private TumblrSessionApi sessionApi;
@@ -40,6 +41,6 @@ public class TumblrSessionApiTest {
     public void refreshTokenTest_KO() {
         String refreshTokenTest = "test_refresh_token";
 
-        assertThrows(ApiClientException.class, () -> this.sessionApi.refreshSession(refreshTokenTest));
+        assertThrows(TumblrApiException.class, () -> this.sessionApi.refreshSession(refreshTokenTest));
     }
 }
