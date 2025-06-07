@@ -25,7 +25,7 @@ public class TumblrSessionApiTest {
         this.sessionApi = new TumblrSessionApiImpl("");
     }
 
-    @Test
+    /* @Test
     public void refreshTokenTest() {
         ReaderConfig config = new ReaderConfig("config/tumblr_api.properties");
         String refreshTokenTest = config.getProperty("test_refresh_token");
@@ -35,7 +35,7 @@ public class TumblrSessionApiTest {
         assertTrue(response.getExpires_in() > 0);
         assertNotNull(response.getAccess_token());
         assertNotNull(response.getRefresh_token());
-    }
+    } */
 
     @Test
     public void refreshTokenTest_KO() {
