@@ -12,7 +12,7 @@ import com.laboratorio.tumblr.model.TumblrSessionResponse;
  * author Rafael
  * version 1.0
  * created 01/05/2025
- * updated 02/05/2025
+ * updated 08/05/2025
  */
 public class TumblrSessionApiImpl extends TumblrBaseApi implements TumblrSessionApi {
     public TumblrSessionApiImpl(String accessToken) {
@@ -20,11 +20,9 @@ public class TumblrSessionApiImpl extends TumblrBaseApi implements TumblrSession
     }
 
     @Override
-    public TumblrSessionResponse refreshSession(String refreshToken) {
+    public TumblrSessionResponse refreshSession(String appClientId, String appClientSecret, String refreshToken) {
         String endpoint = this.config.getProperty("refreshSession_endpoint");
         int okStatus = Integer.parseInt(this.config.getProperty("refreshSession_ok_status"));
-        String appClientId = this.config.getProperty("app_client_id");
-        String appClientSecret = this.config.getProperty("app_client_secret");
         String grantType = this.config.getProperty("refreshSession_grant_type");
 
         try {
@@ -37,7 +35,7 @@ public class TumblrSessionApiImpl extends TumblrBaseApi implements TumblrSession
 
             ApiResponse response = this.client.executeApiRequest(request);
 
-            log.info("Refresh Session response: {}", response.getResponseStr());
+            log.debug("Refresh Session response: {}", response.getResponseStr());
 
             return this.gson.fromJson(response.getResponseStr(), TumblrSessionResponse.class);
         } catch (Exception e) {

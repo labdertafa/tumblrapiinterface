@@ -6,7 +6,7 @@
 
     <groupId>com.laboratorio</groupId>
     <artifactId>tumblrapiinterface</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <name>Tumblr-Api-Interface</name>
     <description>Librería que ejecuta las API de la red social Tumblr</description>
 
