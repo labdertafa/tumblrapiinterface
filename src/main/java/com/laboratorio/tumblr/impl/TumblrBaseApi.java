@@ -9,9 +9,9 @@ import org.apache.logging.log4j.Logger;
 /**
  *
  * author Rafael
- * version 1.0
+ * version 1.1
  * created 01/05/2025
- * updated 02/05/2025
+ * updated 24/12/2025
  */
 public class TumblrBaseApi {
     protected static final Logger log = LogManager.getLogger(TumblrBaseApi.class);
@@ -25,7 +25,16 @@ public class TumblrBaseApi {
         this.accessToken = accessToken;
         this.config = new ReaderConfig("config/tumblr_api.properties");
         this.urlBase = this.config.getProperty("url_base_tumblr");
-        this.client = new ApiClient();
         this.gson = new Gson();
+        String proxyHost = this.config.getProperty("tumblr_proxy_host");
+        String proxyPortStr = this.config.getProperty("tumblr_proxy_port");
+        String certificatePath = this.config.getProperty("tumblr_proxy_certificate");
+        if (proxyHost != null && !proxyHost.isBlank() && proxyPortStr != null && !proxyPortStr.isBlank()
+                && certificatePath != null && !certificatePath.isBlank()) {
+            int proxyPort = Integer.parseInt(proxyPortStr);
+            this.client = new ApiClient(proxyHost, proxyPort, certificatePath);
+        } else {
+            this.client = new ApiClient();
+        }
     }
 }

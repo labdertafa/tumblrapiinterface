@@ -3,15 +3,16 @@ package com.laboratorio.tumblr.exception;
 /**
  *
  * author Rafael
- * version 1.1
+ * version 1.2
  * created 01/05/2025
- * updated 02/05/2025
+ * updated 24/12/2025
  */
 public class TumblrApiException extends RuntimeException {
-    private Throwable causaOriginal = null;
+    private final Throwable causaOriginal;
 
     public TumblrApiException(String message) {
         super(message);
+        this.causaOriginal = null;
     }
 
     public TumblrApiException(String message, Throwable causaOriginal) {

@@ -15,9 +15,9 @@ import java.util.List;
 /**
  *
  * author Rafael
- * version 1.0
+ * version 1.1
  * created 01/05/2025
- * updated 02/05/2025
+ * updated 24/12/2025
  */
 public class TumblrStatusApiImpl extends TumblrBaseApi implements TumblrStatusApi {
     private final String blog;
@@ -43,10 +43,8 @@ public class TumblrStatusApiImpl extends TumblrBaseApi implements TumblrStatusAp
     // Retorna la primera ULR de youtube encontrada o nulo en otro caso
     private String findYoutubeUrl(List<ElementoPost> elementos) {
         for (ElementoPost elemento : elementos) {
-            if (elemento.getType() == TipoElementoPost.Link) {
-                if (this.esUrlYouTube(elemento.getContenido())) {
-                    return elemento.getContenido();
-                }
+            if (elemento.getType() == TipoElementoPost.Link  && this.esUrlYouTube(elemento.getContenido())) {
+                return elemento.getContenido();
             }
         }
 
@@ -54,17 +52,17 @@ public class TumblrStatusApiImpl extends TumblrBaseApi implements TumblrStatusAp
     }
 
     private String obtenerEtiquetas(List<ElementoPost> elementos) {
-        String etiquetas = "";
+        StringBuilder etiquetas = new StringBuilder();
         for (ElementoPost elemento : elementos) {
             if (elemento.getType() == TipoElementoPost.Tag) {
                 if (!etiquetas.isEmpty()) {
-                    etiquetas += ",";
+                    etiquetas.append(",");
                 }
-                etiquetas += elemento.getContenido();
+                etiquetas.append(elemento.getContenido());
             }
         }
 
-        return etiquetas;
+        return etiquetas.toString();
     }
 
     @Override
